@@ -6,6 +6,8 @@ import time
 import os
 import cStringIO
 import re
+import json
+import urllib2
 
 import mwclient
 import mwparserfromhell
@@ -91,7 +93,11 @@ def process_page(page):
 		description = re.sub(r"""\[\[User:.*?\]\] \(\[\[User talk:J.*?\]\]\).*?\(UTC\)""",'',description,flags=re.U) # Remove signatures when possible
 	else:
 		description = ""
-
+	
+	### Fetch image captions used, and list them if exist | A930913 for Sfan00_IMG ###
+	data=json.load(urllib2.urlopen("http://tools-webproxy/cluestuff/cgi-bin/vada/imgcaps.py?img={name}".format(**page)))
+	if len(data): description="* This page: "+description+"\n"+"".join(["* [["+k+"]]: "+data[k]+"\n" for k in data])																																																																																									
+	
 	contents = u"""{{Information
 | description = """+description+"""
 | source      = {{own}}
